@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\BlogResource;
-use App\Models\Blog;
+use App\Models\blogs;
 use App\Models\bookmarks;
 use Illuminate\Http\Request;
 
@@ -20,7 +20,7 @@ class BookmarkController extends Controller
         return BlogResource::collection($blogs);
     }
 
-    public function store(Request $request, Blog $blog)
+    public function store(Request $request, blogs $blog)
     {
         $bookmark = bookmarks::firstOrCreate([
             'user_id' => $request->user()->id,
@@ -33,7 +33,7 @@ class BookmarkController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, Blog $blog)
+    public function destroy(Request $request, blogs $blog)
     {
         bookmarks::where('user_id', $request->user()->id)
             ->where('blog_id', $blog->id)

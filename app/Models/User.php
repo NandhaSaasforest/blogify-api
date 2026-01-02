@@ -7,14 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\blogs;
-use App\Models\bookmarks;
 
 class User extends Authenticatable
 {
-     use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -22,6 +18,8 @@ class User extends Authenticatable
         'password',
         'avatar',
         'bio',
+        'followers_count',
+        'following_count',
     ];
 
     protected $hidden = [
@@ -46,6 +44,36 @@ class User extends Authenticatable
 
     public function bookmarkedBlogs()
     {
-        return $this->belongsToMany(blogs::class, 'bookmarks');
+        return $this->belongsToMany(blogs::class, 'bookmarks', 'user_id', 'blog_id');
+    }
+
+    // Users I follow
+    public function following()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'user_follows',
+            'follower_id',
+            'following_id'
+        )->withTimestamps();
+    }
+
+    // Users who follow me
+    public function followers()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'user_follows',
+            'following_id',
+            'follower_id'
+        )->withTimestamps();
+    }
+
+    // Helper
+    public function isFollowing($userId): bool
+    {
+        return $this->following()
+            ->where('following_id', $userId)
+            ->exists();
     }
 }

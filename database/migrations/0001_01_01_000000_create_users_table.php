@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('password');
             $table->string('avatar')->default('👤'); // Add this
             $table->text('bio')->nullable(); // Add this
+            $table->integer('follower_count')->default(0);
+            $table->integer('following_count')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

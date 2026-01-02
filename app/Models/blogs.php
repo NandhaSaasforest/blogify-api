@@ -4,9 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\hashtags;
-use App\Models\bookmarks;
 
 class blogs extends Model
 {
@@ -36,16 +33,18 @@ class blogs extends Model
 
     public function bookmarks()
     {
-        return $this->hasMany(bookmarks::class);
+        return $this->hasMany(bookmarks::class, 'blog_id');
     }
 
     public function bookmarkedBy()
     {
-        return $this->belongsToMany(User::class, 'bookmarks');
+        return $this->belongsToMany(User::class, 'bookmarks', 'blog_id', 'user_id');
     }
 
     public function isBookmarkedBy($userId)
     {
-        return $this->bookmarks()->where('user_id', $userId)->exists();
+        return $this->bookmarkedBy()
+            ->where('user_id', $userId)
+            ->exists();
     }
 }

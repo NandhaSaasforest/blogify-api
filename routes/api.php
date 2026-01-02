@@ -5,6 +5,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\HashtagController;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -35,4 +36,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bookmarks', [BookmarkController::class, 'index']);
     Route::post('/blogs/{blog}/bookmark', [BookmarkController::class, 'store']);
     Route::delete('/blogs/{blog}/bookmark', [BookmarkController::class, 'destroy']);
+
+    Route::post('/users/{user}/follow', function (User $user) {
+        auth()->user()->following()->syncWithoutDetaching($user->id);
+    });
+
+    Route::delete('/users/{user}/follow', function (User $user) {
+        auth()->user()->following()->detach($user->id);
+    });
+
 });

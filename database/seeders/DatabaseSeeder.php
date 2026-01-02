@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'avatar' => '👨‍💻',
             'bio' => 'Mobile developer passionate about React Native',
+            'follower_count' => 0,
+            'following_count' => 0,
         ]);
 
         $user2 = User::create([
@@ -33,6 +35,8 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'avatar' => '👩‍💼',
             'bio' => 'Full-stack developer and tech writer',
+            'follower_count' => 0,
+            'following_count' => 0,
         ]);
 
         // Create hashtags

@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BlogRequest;
 use App\Http\Resources\BlogResource;
 use App\Models\blogs;
-use App\Models\Hashtag;
+use App\Models\hashtags;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BlogController extends Controller
 {
@@ -60,7 +61,7 @@ class BlogController extends Controller
                 // Remove # if present
                 $tagName = ltrim($tagName, '#');
                 
-                $hashtag = Hashtag::firstOrCreate(
+                $hashtag = hashtags::firstOrCreate(
                     ['name' => "#{$tagName}"],
                     ['usage_count' => 0]
                 );

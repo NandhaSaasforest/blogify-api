@@ -17,6 +17,8 @@ class UserResource extends JsonResource
             'bio' => $this->bio,
             'joinDate' => $this->created_at->format('F Y'),
             'postsCount' => $this->blogs()->count(),
+            'followersCount' => $this->follower_count,
+            'followingCount' => $this->following_count
         ];
     }
 }
