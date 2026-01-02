@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\BlogResource;
 use App\Models\Blog;
-use App\Models\Bookmark;
+use App\Models\bookmarks;
 use Illuminate\Http\Request;
 
 class BookmarkController extends Controller
@@ -22,7 +22,7 @@ class BookmarkController extends Controller
 
     public function store(Request $request, Blog $blog)
     {
-        $bookmark = Bookmark::firstOrCreate([
+        $bookmark = bookmarks::firstOrCreate([
             'user_id' => $request->user()->id,
             'blog_id' => $blog->id,
         ]);
@@ -35,7 +35,7 @@ class BookmarkController extends Controller
 
     public function destroy(Request $request, Blog $blog)
     {
-        Bookmark::where('user_id', $request->user()->id)
+        bookmarks::where('user_id', $request->user()->id)
             ->where('blog_id', $blog->id)
             ->delete();
 

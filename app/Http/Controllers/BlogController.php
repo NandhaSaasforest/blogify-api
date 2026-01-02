@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\BlogRequest;
 use App\Http\Resources\BlogResource;
-use App\Models\Blog;
+use App\Models\blogs;
 use App\Models\Hashtag;
 use Illuminate\Http\Request;
 
@@ -12,7 +12,7 @@ class BlogController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Blog::with(['user', 'hashtags']);
+        $query = blogs::with(['user', 'hashtags']);
 
         // Search functionality
         if ($request->has('search')) {
@@ -45,7 +45,7 @@ class BlogController extends Controller
 
     public function store(BlogRequest $request)
     {
-        $blog = Blog::create([
+        $blog = blogs::create([
             'user_id' => $request->user()->id,
             'title' => $request->title,
             'content' => $request->content,
@@ -73,12 +73,12 @@ class BlogController extends Controller
         return new BlogResource($blog->load(['user', 'hashtags']));
     }
 
-    public function show(Blog $blog)
+    public function show(blogs $blog)
     {
         return new BlogResource($blog->load(['user', 'hashtags']));
     }
 
-    public function update(BlogRequest $request, Blog $blog)
+    public function update(BlogRequest $request, blogs $blog)
     {
         $this->authorize('update', $blog);
 
@@ -102,7 +102,7 @@ class BlogController extends Controller
                 
                 $tagName = ltrim($tagName, '#');
                 
-                $hashtag = Hashtag::firstOrCreate(
+                $hashtag = hashtags::firstOrCreate(
                     ['name' => "#{$tagName}"],
                     ['usage_count' => 0]
                 );
@@ -115,7 +115,7 @@ class BlogController extends Controller
         return new BlogResource($blog->load(['user', 'hashtags']));
     }
 
-    public function destroy(Blog $blog)
+    public function destroy(blogs $blog)
     {
         $this->authorize('delete', $blog);
 
@@ -131,7 +131,7 @@ class BlogController extends Controller
         ]);
     }
 
-    public function like(Request $request, Blog $blog)
+    public function like(Request $request, blogs $blog)
     {
         $blog->increment('likes');
 
@@ -141,7 +141,7 @@ class BlogController extends Controller
         ]);
     }
 
-    public function unlike(Request $request, Blog $blog)
+    public function unlike(Request $request, blogs $blog)
     {
         if ($blog->likes > 0) {
             $blog->decrement('likes');

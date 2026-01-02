@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Hashtag;
+use App\Models\hashtags;
 use Illuminate\Http\Request;
 
 class HashtagController extends Controller
 {
     public function popular()
     {
-        $hashtags = Hashtag::orderBy('usage_count', 'desc')
+        $hashtags = hashtags::orderBy('usage_count', 'desc')
             ->take(5)
             ->pluck('name');
 
@@ -20,7 +20,7 @@ class HashtagController extends Controller
 
     public function index(Request $request)
     {
-        $query = Hashtag::query();
+        $query = hashtags::query();
 
         if ($request->has('search')) {
             $query->where('name', 'like', "%{$request->search}%");

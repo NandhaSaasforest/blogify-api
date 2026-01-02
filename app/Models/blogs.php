@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\hashtags;
+use App\Models\bookmarks;
 
 class blogs extends Model
 {
@@ -28,7 +31,7 @@ class blogs extends Model
 
     public function hashtags()
     {
-        return $this->belongsToMany(hastags::class);
+        return $this->belongsToMany(hashtags::class, 'blog_hashtags', 'blog_id', 'hashtag_id'); // Use blog_hastags pivot table
     }
 
     public function bookmarks()

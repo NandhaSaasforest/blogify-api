@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\blogs;
-use App\Models\hastags;
+use App\Models\hashtags;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -36,10 +36,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create hashtags
-        $reactnative = hastags::create(['name' => '#reactnative', 'usage_count' => 0]);
-        $mobile = hastags::create(['name' => '#mobile', 'usage_count' => 0]);
-        $javascript = hastags::create(['name' => '#javascript', 'usage_count' => 0]);
-        $design = hastags::create(['name' => '#design', 'usage_count' => 0]);
+        $reactnative = hashtags::create(['name' => '#reactnative', 'usage_count' => 0]);
+        $mobile = hashtags::create(['name' => '#mobile', 'usage_count' => 0]);
+        $javascript = hashtags::create(['name' => '#javascript', 'usage_count' => 0]);
+        $design = hashtags::create(['name' => '#design', 'usage_count' => 0]);
 
         // Create blogs
         $blog1 = blogs::create([
@@ -59,7 +59,7 @@ class DatabaseSeeder extends Seeder
         $blog2->hashtags()->attach([$reactnative->id, $javascript->id]);
 
         // Update hashtag counts
-        hastags::all()->each(function ($hashtag) {
+        hashtags::all()->each(function ($hashtag) {
             $hashtag->usage_count = $hashtag->blogs()->count();
             $hashtag->save();
         });
