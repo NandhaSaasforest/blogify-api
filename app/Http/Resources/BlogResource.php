@@ -20,8 +20,11 @@ class BlogResource extends JsonResource
                 'avatar' => $this->user->avatar,
             ],
             'hashtags' => $this->hashtags->pluck('name')->toArray(),
-            'isBookmarked' => $request->user() 
-                ? $this->isBookmarkedBy($request->user()->id) 
+            'isBookmarked' => $request->user()
+                ? $this->isBookmarkedBy($request->user()->id)
+                : false,
+            'is_liked' => $request->user()
+                ? $this->likedByUsers->pluck('id')->contains($request->user()->id)
                 : false,
             'createdAt' => $this->created_at->format('Y-m-d'),
             'updatedAt' => $this->updated_at->format('Y-m-d'),

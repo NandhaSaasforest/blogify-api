@@ -7,29 +7,28 @@ use App\Http\Resources\BlogResource;
 use App\Models\blogs;
 use App\Models\hashtags;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class BlogController extends Controller
 {
     public function index(Request $request)
     {
-        $query = blogs::with(['user', 'hashtags']);
+        $query = blogs::with(['user', 'hashtags', 'likedByUsers']);
 
         // Search functionality
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%")
-                  ->orWhereHas('hashtags', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhere('content', 'like', "%{$search}%")
+                    ->orWhereHas('hashtags', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
         // Filter by hashtag
         if ($request->has('hashtag')) {
-            $query->whereHas('hashtags', function($q) use ($request) {
+            $query->whereHas('hashtags', function ($q) use ($request) {
                 $q->where('name', $request->hashtag);
             });
         }
@@ -56,27 +55,39 @@ class BlogController extends Controller
         if ($request->has('hashtags') && is_array($request->hashtags)) {
             foreach ($request->hashtags as $tagName) {
                 $tagName = trim($tagName);
-                if (empty($tagName)) continue;
-                
+                if (empty($tagName)) {
+                    continue;
+                }
+
                 // Remove # if present
                 $tagName = ltrim($tagName, '#');
-                
+
                 $hashtag = hashtags::firstOrCreate(
                     ['name' => "#{$tagName}"],
                     ['usage_count' => 0]
                 );
-                
+
                 $hashtag->increment('usage_count');
                 $blog->hashtags()->attach($hashtag->id);
             }
         }
 
-        return new BlogResource($blog->load(['user', 'hashtags']));
+        return new BlogResource($blog->load(['user', 'hashtags', 'likedByUsers']));
     }
 
     public function show(blogs $blog)
     {
-        return new BlogResource($blog->load(['user', 'hashtags']));
+        return new BlogResource($blog->load(['user', 'hashtags', 'likedByUsers']));
+    }
+
+    public function status(Request $request, blogs $blog)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'is_liked' => $user->likedPosts()->where('blog_id', $blog->id)->exists(),
+            'is_bookmarked' => $blog->isBookmarkedBy($user->id),
+        ]);
     }
 
     public function update(BlogRequest $request, blogs $blog)
@@ -99,21 +110,23 @@ class BlogController extends Controller
             // Add new hashtags
             foreach ($request->hashtags as $tagName) {
                 $tagName = trim($tagName);
-                if (empty($tagName)) continue;
-                
+                if (empty($tagName)) {
+                    continue;
+                }
+
                 $tagName = ltrim($tagName, '#');
-                
+
                 $hashtag = hashtags::firstOrCreate(
                     ['name' => "#{$tagName}"],
                     ['usage_count' => 0]
                 );
-                
+
                 $hashtag->increment('usage_count');
                 $blog->hashtags()->attach($hashtag->id);
             }
         }
 
-        return new BlogResource($blog->load(['user', 'hashtags']));
+        return new BlogResource($blog->load(['user', 'hashtags', 'likedByUsers']));
     }
 
     public function destroy(blogs $blog)
@@ -134,23 +147,41 @@ class BlogController extends Controller
 
     public function like(Request $request, blogs $blog)
     {
+        $user = $request->user();
+
+        if ($user->likedPosts()->where('blog_id', $blog->id)->exists()) {
+            return response()->json([
+                'message' => 'Blog already liked',
+                'likes' => $blog->likes,
+            ], 409);
+        }
+
         $blog->increment('likes');
+        $user->likedPosts()->attach($blog->id);
 
         return response()->json([
             'message' => 'Blog liked',
-            'likes' => $blog->likes,
+            'likes' => $blog->fresh()->likes,
         ]);
     }
 
     public function unlike(Request $request, blogs $blog)
     {
-        if ($blog->likes > 0) {
-            $blog->decrement('likes');
+        $user = $request->user();
+
+        if (!$user->likedPosts()->where('blog_id', $blog->id)->exists()) {
+            return response()->json([
+                'message' => 'Blog not liked yet',
+                'likes' => $blog->likes,
+            ], 409);
         }
+
+        $blog->decrement('likes');
+        $user->likedPosts()->detach($blog->id);
 
         return response()->json([
             'message' => 'Blog unliked',
-            'likes' => $blog->likes,
+            'likes' => $blog->fresh()->likes,
         ]);
     }
 }

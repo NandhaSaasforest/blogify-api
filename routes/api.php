@@ -11,7 +11,6 @@ use App\Models\User;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Public blog routes
 Route::get('/blogs', [BlogController::class, 'index']);
 Route::get('/blogs/{blog}', [BlogController::class, 'show']);
 
@@ -26,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
 
     // Blog routes
+    Route::get('/blogs/{blog}/status', [BlogController::class, 'status']);
     Route::post('/blogs', [BlogController::class, 'store']);
     Route::put('/blogs/{blog}', [BlogController::class, 'update']);
     Route::delete('/blogs/{blog}', [BlogController::class, 'destroy']);
@@ -44,5 +44,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/{user}/follow', function (User $user) {
         auth()->user()->following()->detach($user->id);
     });
-
 });

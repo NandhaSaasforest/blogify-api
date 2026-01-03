@@ -18,7 +18,7 @@ class User extends Authenticatable
         'password',
         'avatar',
         'bio',
-        'followers_count',
+        'follower_count',
         'following_count',
     ];
 
@@ -75,5 +75,10 @@ class User extends Authenticatable
         return $this->following()
             ->where('following_id', $userId)
             ->exists();
+    }
+
+    public function likedPosts()
+    {
+        return $this->belongsToMany(blogs::class, 'post_likes', 'user_id', 'blog_id');
     }
 }

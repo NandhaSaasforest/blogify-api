@@ -47,4 +47,9 @@ class blogs extends Model
             ->where('user_id', $userId)
             ->exists();
     }
+
+    public function likedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'post_likes', 'blog_id', 'user_id');
+    }
 }
