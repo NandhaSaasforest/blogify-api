@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HashtagController;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
@@ -44,4 +45,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/{user}/follow', function (User $user) {
         auth()->user()->following()->detach($user->id);
     });
+
+    Route::get('/blogs/{blog}/comments', [CommentController::class, 'index']);
+    Route::post('/blogs/{blog}/comments', [CommentController::class, 'store']);
+    Route::post('/blogs/{blog}/comments/{comment}/replies', [CommentController::class, 'reply']);
+    Route::put('/blogs/{blog}/comments/{comment}', [CommentController::class, 'update']);
+    Route::delete('/blogs/{blog}/comments/{comment}', [CommentController::class, 'destroy']);
+    Route::post('/blogs/{blog}/comments/{comment}/like', [CommentController::class, 'like']);
+    Route::delete('/blogs/{blog}/comments/{comment}/like', [CommentController::class, 'unlike']);
 });

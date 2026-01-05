@@ -52,4 +52,9 @@ class blogs extends Model
     {
         return $this->belongsToMany(User::class, 'post_likes', 'blog_id', 'user_id');
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }
